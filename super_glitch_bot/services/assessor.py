@@ -18,6 +18,12 @@ class TokenAssessor:
         liquidity = (
             token.get("dexscreener_data", {}).get("liquidity", {}).get("usd", 0.0)
         )
+        self.logger.debug(
+            "Assessing token %s with score=%s liquidity=%s",
+            token.get("address"),
+            score,
+            liquidity,
+        )
         result = score >= self.min_score and liquidity >= self.min_liquidity
         self.logger.info(
             "Assessment for %s: score=%s liquidity=%s result=%s",

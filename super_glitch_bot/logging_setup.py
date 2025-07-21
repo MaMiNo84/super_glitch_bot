@@ -10,4 +10,6 @@ def configure_logging() -> Logger:
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    return logging.getLogger("super_glitch_bot")
+    logger = logging.getLogger("super_glitch_bot")
+    logger.debug("Logging configured")
+    return logger

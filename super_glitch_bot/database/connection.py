@@ -21,11 +21,13 @@ class Database:
         self.logger.info("Connecting to MongoDB at %s", self.uri)
         self.client = MongoClient(self.uri)
         self.db = self.client[self.name]
+        self.logger.debug("MongoDB connection established")
 
     def get_collection(self, name: str) -> Any:
         """Return a collection by name."""
         if self.db is None:
             raise RuntimeError("Database not connected")
+        self.logger.debug("Accessing collection %s", name)
         return self.db[name]
 
     def update_token(self, address: str, updates: Dict[str, Any]) -> None:

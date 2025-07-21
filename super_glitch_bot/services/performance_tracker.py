@@ -43,6 +43,7 @@ class PerformanceTracker:
 
     async def update(self) -> None:
         """Send performance updates."""
+        self.logger.debug("Updating performance for %d tokens", len(self.tokens))
         for addr, info in self.tokens.items():
             data = self.dexscreener.fetch_token_data(addr)
             pair = self.dexscreener.get_raydium_pair(data)
@@ -57,6 +58,7 @@ class PerformanceTracker:
             if not info["hit_2x"] and price >= 2 * info["initial_price"]:
                 info["hit_2x"] = True
                 self.calls_2x += 1
+                self.logger.debug("Token %s hit 2x at price %s", addr, price)
                 await self.bot.send_message(
                     self.chat_id,
                     MessageTemplates.PERFORMANCE_UPDATE.format(
@@ -71,6 +73,7 @@ class PerformanceTracker:
 
     def get_stats(self) -> Dict[str, Any]:
         """Return aggregated performance statistics."""
+        self.logger.debug("Generating performance statistics")
         if self.calls == 0:
             return {"calls": 0, "reached_2x": 0, "average_x": 0.0}
         avg_x = (
