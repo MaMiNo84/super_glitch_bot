@@ -1,7 +1,7 @@
 """MongoDB connection utilities."""
 
 from pymongo import MongoClient
-from typing import Any
+from typing import Any, Optional
 
 
 class Database:
@@ -10,7 +10,7 @@ class Database:
     def __init__(self, uri: str, name: str) -> None:
         self.uri = uri
         self.name = name
-        self.client: MongoClient | None = None
+        self.client: Optional[MongoClient] = None
         self.db = None
 
     def connect(self) -> None:
