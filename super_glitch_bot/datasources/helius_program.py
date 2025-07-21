@@ -18,18 +18,22 @@ class ProgramHeliusSource(HeliusSource):
         parsed_type: Optional[str] = None,
         decoder: Optional[Callable[[Dict[str, Any]], Optional[str]]] = None,
         on_token: Optional[Callable[[str], Awaitable[None]]] = None,
+        mint_field: str = "mint",
+        token_mint_field: str = "tokenMint",
     ) -> None:
         super().__init__(rpc_url, [program_id], on_token)
         self.program_id = program_id
         self.parsed_type = parsed_type
         self.decoder = decoder
+        self.mint_field = mint_field
+        self.token_mint_field = token_mint_field
 
     def parse_instruction(self, instruction: Dict[str, Any]) -> Optional[str]:
         if self.parsed_type:
             parsed = instruction.get("parsed")
             if parsed and parsed.get("type") == self.parsed_type:
                 info = parsed.get("info", {})
-                mint = info.get("mint") or info.get("tokenMint")
+                mint = info.get(self.mint_field) or info.get(self.token_mint_field)
                 self.logger.debug(
                     "Parsed %s instruction info=%s", self.parsed_type, info
                 )
