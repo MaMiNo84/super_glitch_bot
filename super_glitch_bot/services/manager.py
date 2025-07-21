@@ -1,5 +1,6 @@
 """Central service manager."""
 
+import logging
 from typing import Any, Dict
 
 from ..database.connection import Database
@@ -19,13 +20,14 @@ class ServiceManager:
 
     def __init__(self, config: Dict[str, Any]) -> None:
         self.config = config
+        self.logger = logging.getLogger(__name__)
         self.db = Database(config["mongodb"]["uri"], config["mongodb"]["name"])
         self.dexscreener = DexScreenerSource("solana")
         self.rugcheck = RugCheckSource(config.get("rugcheck_api_key", ""))
         self.assessor = TokenAssessor()
         self.bot = TelegramBot(config["telegram"]["token"], self)
         chat_id = config["telegram"]["admins"][0]
-        self.tracker = PerformanceTracker(self.dexscreener, self.bot, chat_id)
+        self.tracker = PerformanceTracker(self.dexscreener, self.bot, chat_id, self.db)
         helius = HeliusSource(
             config["helius"]["ws_url"],
             ["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"],
@@ -39,13 +41,16 @@ class ServiceManager:
         import asyncio
 
         self.db.connect()
+        self.logger.info("Service started")
         self.monitor_task = asyncio.create_task(self.monitor.run())
         await self.bot.run()
 
     async def handle_new_token(self, address: str) -> None:
         """Process a newly created token."""
+        self.logger.info("Processing new token %s", address)
         rug_data = self.rugcheck.fetch_token_data(address)
         dex_data = self.dexscreener.fetch_token_data(address)
+        pair = self.dexscreener.get_raydium_pair(dex_data)
         token = Token(
             address=address,
             name=rug_data.get("name") or dex_data.get("name"),
@@ -53,6 +58,7 @@ class ServiceManager:
             decimals=rug_data.get("decimals") or dex_data.get("decimals"),
             rugcheck_report=rug_data,
             dexscreener_data=dex_data,
+            raydium_pair=pair,
         )
         coll = self.db.get_collection("tokens")
         coll.insert_one(token.__dict__)
@@ -64,6 +70,8 @@ class ServiceManager:
                 MessageTemplates.NEW_GEM.format(token_name=token.name or token.address),
             )
             self.tracker.track(token.__dict__)
+        else:
+            self.logger.info("Token %s did not pass assessment", address)
 
     def stop_monitoring(self) -> None:
         """Placeholder to stop monitoring loop."""
