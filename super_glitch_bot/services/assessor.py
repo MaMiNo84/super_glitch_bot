@@ -7,10 +7,13 @@ class TokenAssessor:
     """Assess tokens and identify gems."""
 
     def __init__(self) -> None:
-        # TODO: setup assessment rules
-        pass
+        self.min_score = 60
+        self.min_liquidity = 1000.0
 
     def assess(self, token: Dict[str, Any]) -> bool:
         """Return True if the token qualifies as a gem."""
-        # TODO: implement assessment logic
-        raise NotImplementedError
+        score = token.get("rugcheck_report", {}).get("score", 0)
+        liquidity = (
+            token.get("dexscreener_data", {}).get("liquidity", {}).get("usd", 0.0)
+        )
+        return score >= self.min_score and liquidity >= self.min_liquidity
