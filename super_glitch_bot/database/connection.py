@@ -36,6 +36,9 @@ class Database:
         self.logger.info("Updating token %s with %s", address, updates)
         coll.update_one({"address": address}, {"$set": updates})
 
-    def deactivate_token(self, address: str) -> None:
-        """Mark a token as inactive."""
-        self.update_token(address, {"active": False})
+    def deactivate_token(self, address: str, reason: str = "") -> None:
+        """Mark a token as inactive and store the reason."""
+        updates = {"active": False}
+        if reason:
+            updates["death_reason"] = reason
+        self.update_token(address, updates)

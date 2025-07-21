@@ -28,4 +28,7 @@ def load_config(path: Path = CONFIG_PATH) -> Dict[str, Any]:
             return [_resolve(v) for v in value]
         return value
 
-    return _resolve(raw_cfg)
+    cfg = _resolve(raw_cfg)
+    cfg.setdefault("assessment_interval", 120)
+    cfg.setdefault("performance_interval", 120)
+    return cfg

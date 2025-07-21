@@ -12,3 +12,5 @@ helius:
   api_key: "${HELIUS_API_KEY}"
   rpc_url: "https://mainnet.helius-rpc.com"
   ws_url: "wss://mainnet.helius-rpc.com"
+assessment_interval: 120
+performance_interval: 120

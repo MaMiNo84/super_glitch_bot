@@ -1,6 +1,7 @@
 """Track token performance after signaling."""
 
 import logging
+import asyncio
 from typing import Any, Dict, List, Optional
 
 from .message_templates import MessageTemplates
@@ -70,6 +71,12 @@ class PerformanceTracker:
                     self.database.get_collection("tokens").update_one(
                         {"address": addr}, {"$push": {"status_history": "hit_2x"}}
                     )
+
+    async def run_scheduler(self, interval: int) -> None:
+        """Periodically call :meth:`update`."""
+        while True:
+            await self.update()
+            await asyncio.sleep(interval)
 
     def get_stats(self) -> Dict[str, Any]:
         """Return aggregated performance statistics."""

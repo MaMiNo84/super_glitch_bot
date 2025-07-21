@@ -13,6 +13,7 @@ from ..telegram_bot.bot import TelegramBot
 from .monitor import TokenMonitor
 from .assessor import TokenAssessor
 from .performance_tracker import PerformanceTracker
+from .evaluator import TokenEvaluator
 from ..database.models import Token
 from .message_templates import MessageTemplates
 
@@ -30,6 +31,16 @@ class ServiceManager:
         self.bot = TelegramBot(config["telegram"]["token"], self)
         chat_id = config["telegram"]["admins"][0]
         self.tracker = PerformanceTracker(self.dexscreener, self.bot, chat_id, self.db)
+        self.evaluator = TokenEvaluator(
+            self.db,
+            self.rugcheck,
+            self.dexscreener,
+            self.assessor,
+            self.tracker,
+            self.bot,
+            chat_id,
+            config.get("assessment_interval", 120),
+        )
         ws_url = config["helius"]["ws_url"]
         helius = HeliusSource(
             ws_url,
@@ -40,6 +51,8 @@ class ServiceManager:
         bonk = BonkSource(ws_url, self.handle_new_token)
         self.monitor = TokenMonitor([helius, pump, bonk], self.handle_new_token)
         self.monitor_task = None
+        self.evaluator_task = None
+        self.performance_task = None
 
     async def start(self) -> None:
         """Start monitoring and bot services."""
@@ -52,6 +65,10 @@ class ServiceManager:
             [s.__class__.__name__ for s in self.monitor.sources],
         )
         self.monitor_task = asyncio.create_task(self.monitor.run())
+        self.evaluator_task = asyncio.create_task(self.evaluator.run())
+        self.performance_task = asyncio.create_task(
+            self.tracker.run_scheduler(self.config.get("performance_interval", 120))
+        )
         await self.bot.run()
 
     async def handle_new_token(self, address: str) -> None:
@@ -73,9 +90,20 @@ class ServiceManager:
         )
         coll = self.db.get_collection("tokens")
         self.logger.debug("Inserting token document into DB")
+        passed = self.assessor.assess(token.__dict__)
+        assessment_entry = {
+            "timestamp": token.created_at,
+            "score": rug_data.get("score", 0),
+            "liquidity": dex_data.get("liquidity", {}).get("usd", 0.0),
+            "passed": passed,
+        }
+        if passed:
+            token.passed_filter = True
+        token.assessment_history.append(assessment_entry)
+        token.last_assessed = token.created_at
         coll.insert_one(token.__dict__)
 
-        if self.assessor.assess(token.__dict__):
+        if passed:
             chat_id = self.config["telegram"]["admins"][0]
             await self.bot.send_message(
                 chat_id,
