@@ -1,8 +1,14 @@
 # Sample configuration file
 mongodb:
-  uri: "mongodb://localhost:27017"
-  name: "tokens"
+  uri: "${MONGODB_URI}"
+  name: "super_glitch_bot"
 telegram:
-  token: "YOUR_TELEGRAM_TOKEN"
+  token: "${TELEGRAM_BOT_TOKEN}"
+  api_id: "${TELEGRAM_API_ID}"
+  api_hash: "${TELEGRAM_API_HASH}"
+  admins:
+    - 123456789
 helius:
-  rpc_url: "wss://helius.example.com"
+  api_key: "${HELIUS_API_KEY}"
+  rpc_url: "https://mainnet.helius-rpc.com"
+  ws_url: "wss://mainnet.helius-rpc.com"
