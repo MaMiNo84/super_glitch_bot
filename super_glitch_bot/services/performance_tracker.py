@@ -45,8 +45,28 @@ class PerformanceTracker:
     async def update(self) -> None:
         """Send performance updates."""
         self.logger.debug("Updating performance for %d tokens", len(self.tokens))
-        for addr, info in self.tokens.items():
-            data = self.dexscreener.fetch_token_data(addr)
+        for addr, info in list(self.tokens.items()):
+            try:
+                data = self.dexscreener.fetch_token_data(addr)
+            except Exception as exc:  # pragma: no cover - network failure
+                self.logger.error("Failed fetching data for %s: %s", addr, exc)
+                await self.bot.send_message(
+                    self.chat_id,
+                    MessageTemplates.ERROR.format(details=str(exc)),
+                )
+                continue
+            if not data:
+                token_name = info["token"].get("name") or addr
+                await self.bot.send_message(
+                    self.chat_id,
+                    MessageTemplates.TOKEN_DELISTED.format(token_name=token_name),
+                )
+                self.tokens.pop(addr, None)
+                if self.database:
+                    self.database.get_collection("tokens").update_one(
+                        {"address": addr}, {"$push": {"status_history": "delisted"}}
+                    )
+                continue
             pair = self.dexscreener.get_raydium_pair(data)
             if pair and not info["token"].get("raydium_pair"):
                 info["token"]["raydium_pair"] = pair
