@@ -19,9 +19,6 @@ class BonkSource(ProgramHeliusSource):
         self, rpc_url: str, on_token: Optional[Callable[[str], Awaitable[None]]] = None
     ) -> None:
         def decoder(ix: Dict[str, Any]) -> Optional[str]:
-            if ix.get("programId") != self.PROGRAM_ID:
-                return None
-
             data_b64 = ix.get("data")
             if not data_b64:
                 self.logger.debug("Bonk instruction missing data")
