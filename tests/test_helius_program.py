@@ -15,11 +15,29 @@ def test_parse_with_parsed_type():
 def test_parse_with_decoder():
     calls = []
 
-    def decoder(data: str):
-        calls.append(data)
+    def decoder(ix: dict):
+        calls.append(ix)
         return "mint2"
 
     source = ProgramHeliusSource("ws://", "pid", decoder=decoder)
     instruction = {"data": "abc"}
     assert source.parse_instruction(instruction) == "mint2"
-    assert calls == ["abc"]
+    assert calls == [instruction]
+
+
+def test_parse_with_fallback_to_decoder():
+    calls = []
+
+    def decoder(ix: dict):
+        calls.append(ix)
+        return "mint3"
+
+    source = ProgramHeliusSource(
+        "ws://",
+        "pid",
+        parsed_type="Create",
+        decoder=decoder,
+    )
+    instruction = {"data": "def"}
+    assert source.parse_instruction(instruction) == "mint3"
+    assert calls == [instruction]

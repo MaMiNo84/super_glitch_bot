@@ -16,7 +16,7 @@ class ProgramHeliusSource(HeliusSource):
         rpc_url: str,
         program_id: str,
         parsed_type: Optional[str] = None,
-        decoder: Optional[Callable[[str], Optional[str]]] = None,
+        decoder: Optional[Callable[[Dict[str, Any]], Optional[str]]] = None,
         on_token: Optional[Callable[[str], Awaitable[None]]] = None,
     ) -> None:
         super().__init__(rpc_url, [program_id], on_token)
@@ -34,14 +34,14 @@ class ProgramHeliusSource(HeliusSource):
                     "Parsed %s instruction info=%s", self.parsed_type, info
                 )
                 return mint
-            self.logger.debug("Ignored instruction %s", parsed)
-            return None
+            if parsed is not None:
+                self.logger.debug("Ignored instruction %s", parsed)
 
         if self.decoder:
-            data = instruction.get("data")
             try:
-                mint = self.decoder(data)
-                self.logger.debug("Decoded raw instruction to mint %s", mint)
+                mint = self.decoder(instruction)
+                if mint:
+                    self.logger.debug("Decoded raw instruction to mint %s", mint)
                 return mint
             except Exception as exc:  # pragma: no cover - defensive
                 self.logger.exception("Decode failed: %s", exc)
