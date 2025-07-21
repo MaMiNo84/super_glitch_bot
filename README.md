@@ -30,3 +30,14 @@ the MongoDB connection is closed.
 - `services/` - monitoring, assessment and tracking logic
 - `telegram_bot/` - telegram bot implementation
 - `utils/` - helper utilities
+
+## Message Templates
+The bot uses predefined message templates from
+`services/message_templates.py` for Telegram notifications:
+
+- `NEW_GEM` - announces a newly listed token.
+- `PERFORMANCE_UPDATE` - notifies about token performance milestones.
+- `STARTED` - sent when the monitoring service starts.
+- `STOPPED` - sent when the service stops.
+- `ERROR` - generic error message template.
+- `TOKEN_DELISTED` - indicates a tracked token was delisted.

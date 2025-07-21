@@ -3,10 +3,12 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from ..services.message_templates import MessageTemplates
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Start command handler."""
-    await update.message.reply_text("Monitoring service is running.")
+    await update.message.reply_text(MessageTemplates.STARTED)
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -14,7 +16,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     manager = context.bot_data.get("manager")
     if manager:
         await manager.stop_monitoring()
-    await update.message.reply_text("Monitoring stopped.")
+    await update.message.reply_text(MessageTemplates.STOPPED)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -36,7 +38,9 @@ async def start_platform(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         manager.start_platform(context.args[0])
         await update.message.reply_text(f"Platform {context.args[0]} started.")
     else:
-        await update.message.reply_text("Usage: /start_platform <name>")
+        await update.message.reply_text(
+            MessageTemplates.ERROR.format(details="Usage: /start_platform <name>")
+        )
 
 
 async def stop_platform(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -46,7 +50,9 @@ async def stop_platform(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         manager.stop_platform(context.args[0])
         await update.message.reply_text(f"Platform {context.args[0]} stopped.")
     else:
-        await update.message.reply_text("Usage: /stop_platform <name>")
+        await update.message.reply_text(
+            MessageTemplates.ERROR.format(details="Usage: /stop_platform <name>")
+        )
 
 
 async def set_gem_filter(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -56,4 +62,8 @@ async def set_gem_filter(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         manager.set_gem_filter(context.args[0], context.args[1])
         await update.message.reply_text("Gem filter updated.")
     else:
-        await update.message.reply_text("Usage: /set_gem_filter <key> <value>")
+        await update.message.reply_text(
+            MessageTemplates.ERROR.format(
+                details="Usage: /set_gem_filter <key> <value>"
+            )
+        )
