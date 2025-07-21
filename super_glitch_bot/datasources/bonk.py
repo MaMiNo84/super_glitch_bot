@@ -1,11 +1,11 @@
 """BonkBOT program integration using Helius logs."""
 
-from typing import Any, Dict, Optional, Awaitable, Callable
+from typing import Awaitable, Callable, Optional
 
-from .helius import HeliusSource
+from .helius_program import ProgramHeliusSource
 
 
-class BonkSource(HeliusSource):
+class BonkSource(ProgramHeliusSource):
     """Detect new tokens created via bonk."""
 
     PROGRAM_ID = "LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj"
@@ -13,14 +13,6 @@ class BonkSource(HeliusSource):
     def __init__(
         self, rpc_url: str, on_token: Optional[Callable[[str], Awaitable[None]]] = None
     ) -> None:
-        super().__init__(rpc_url, [self.PROGRAM_ID], on_token)
-
-    def parse_instruction(self, instruction: Dict[str, Any]) -> Optional[str]:
-        parsed = instruction.get("parsed")
-        if parsed and parsed.get("type") == "initialize":
-            info = parsed.get("info", {})
-            mint = info.get("mint") or info.get("tokenMint")
-            self.logger.debug("Bonk initialize instruction info=%s", info)
-            return mint
-        self.logger.debug("Bonk ignored instruction %s", parsed)
-        return None
+        super().__init__(
+            rpc_url, self.PROGRAM_ID, parsed_type="initialize", on_token=on_token
+        )
