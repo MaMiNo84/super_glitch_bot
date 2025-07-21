@@ -24,3 +24,14 @@ def test_parse_bonk_raw_instruction():
         "accounts": ["creator", "mintABC"],
     }
     assert source.parse_instruction(instruction) == "mintABC"
+
+
+
+def test_bonk_ignores_other_program():
+    source = BonkSource("ws")
+    instruction = {
+        "programId": "other",
+        "parsed": {"type": "initialize", "info": {"mint": "mint123"}},
+    }
+    assert source.parse_instruction(instruction) is None
+
