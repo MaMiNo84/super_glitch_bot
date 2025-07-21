@@ -51,6 +51,12 @@ class ServiceManager:
         pump = PumpFunSource(ws_url, self.handle_new_token)
         bonk = BonkSource(ws_url, self.handle_new_token)
         self.monitor = TokenMonitor([helius, pump, bonk], self.handle_new_token)
+        self.platforms = {
+            "helius": helius,
+            "pumpfun": pump,
+            "bonk": bonk,
+        }
+        self.platform_states = {name: True for name in self.platforms}
         self.monitor_task = None
         self.evaluator_task = None
         self.performance_task = None
@@ -129,15 +135,32 @@ class ServiceManager:
 
     def start_platform(self, name: str) -> None:
         """Enable a monitoring platform."""
-        # Implementation depends on platform specifics
-        pass
+        source = self.platforms.get(name)
+        if not source:
+            self.logger.warning("Unknown platform %s", name)
+            return
+        if source not in self.monitor.sources:
+            self.logger.info("Enabling platform %s", name)
+            self.monitor.sources.append(source)
+        self.platform_states[name] = True
 
     def stop_platform(self, name: str) -> None:
         """Disable a monitoring platform."""
-        # Implementation depends on platform specifics
-        pass
+        source = self.platforms.get(name)
+        if not source:
+            self.logger.warning("Unknown platform %s", name)
+            return
+        if source in self.monitor.sources:
+            self.logger.info("Disabling platform %s", name)
+            self.monitor.sources.remove(source)
+        self.platform_states[name] = False
 
     def set_gem_filter(self, key: str, value: Any) -> None:
         """Set a gem filter option."""
-        # Persist filter to DB or config in a real implementation
-        pass
+        if key in {"score", "min_score"}:
+            self.assessor.min_score = int(value)
+        if key in {"liquidity", "min_liquidity"}:
+            self.assessor.min_liquidity = float(value)
+        coll = self.db.get_collection("gem_filter")
+        coll.update_one({"_id": "config"}, {"$set": {key: value}}, upsert=True)
+        self.logger.debug("Gem filter %s set to %s", key, value)
