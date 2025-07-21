@@ -12,7 +12,12 @@ async def main() -> None:
     configure_logging()
     config = load_config()
     manager = ServiceManager(config)
-    await manager.start()
+    try:
+        await manager.start()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        await manager.stop_monitoring()
 
 
 if __name__ == "__main__":

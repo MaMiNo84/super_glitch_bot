@@ -18,6 +18,11 @@ Run the project with:
 python main.py
 ```
 
+## Shutdown
+The service listens for `Ctrl+C`/SIGINT and the `/stop` command from Telegram.
+On shutdown, background tasks are cancelled, the Telegram bot is stopped, and
+the MongoDB connection is closed.
+
 ## Project Structure
 - `super_glitch_bot/` - core package containing all modules
 - `database/` - MongoDB connection and models

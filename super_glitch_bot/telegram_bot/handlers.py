@@ -13,7 +13,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Stop command handler."""
     manager = context.bot_data.get("manager")
     if manager:
-        manager.stop_monitoring()
+        await manager.stop_monitoring()
     await update.message.reply_text("Monitoring stopped.")
 
 
