@@ -43,9 +43,12 @@ class ProgramHeliusSource(HeliusSource):
                 if mint:
                     self.logger.debug("Decoded raw instruction to mint %s", mint)
                 return mint
-            except Exception as exc:  # pragma: no cover - defensive
-                self.logger.exception("Decode failed: %s", exc)
+            except (KeyError, ValueError) as exc:  # Handle expected exceptions
+                self.logger.warning("Decoder raised an expected exception: %s", exc)
                 return None
+            except Exception as exc:  # Catch unexpected exceptions
+                self.logger.exception("Unexpected error in decoder: %s", exc)
+                raise
         return None
 
     async def _listen(self) -> None:
