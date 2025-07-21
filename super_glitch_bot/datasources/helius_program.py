@@ -25,6 +25,9 @@ class ProgramHeliusSource(HeliusSource):
         self.decoder = decoder
 
     def parse_instruction(self, instruction: Dict[str, Any]) -> Optional[str]:
+        if instruction.get("programId") not in (None, self.program_id):
+            return None
+
         if self.parsed_type:
             parsed = instruction.get("parsed")
             if parsed and parsed.get("type") == self.parsed_type:

@@ -41,3 +41,12 @@ def test_parse_with_fallback_to_decoder():
     instruction = {"data": "def"}
     assert source.parse_instruction(instruction) == "mint3"
     assert calls == [instruction]
+
+
+def test_parse_ignores_other_program_id():
+    source = ProgramHeliusSource("ws://", "pid", parsed_type="Create")
+    instruction = {
+        "programId": "other",
+        "parsed": {"type": "Create", "info": {"mint": "mintX"}},
+    }
+    assert source.parse_instruction(instruction) is None
