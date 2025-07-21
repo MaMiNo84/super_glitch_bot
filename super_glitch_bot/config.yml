@@ -14,3 +14,4 @@ helius:
   ws_url: "wss://mainnet.helius-rpc.com"
 assessment_interval: 120
 performance_interval: 120
+moralis_api_key: "${MORALIS_API_KEY}"
