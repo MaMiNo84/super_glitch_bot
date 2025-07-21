@@ -5,12 +5,7 @@ setup(
     version='0.1.0',
     packages=find_packages(),
     install_requires=[
-        'pymongo',
-        'websockets',
-        'python-telegram-bot',
-        'PyYAML',
-        'jinja2',
-        'matplotlib',
+        # List dependencies here
     ],
     entry_points={
         'console_scripts': [

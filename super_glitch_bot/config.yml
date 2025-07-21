@@ -1,8 +1,0 @@
-# Sample configuration file
-mongodb:
-  uri: "mongodb://localhost:27017"
-  name: "tokens"
-telegram:
-  token: "YOUR_TELEGRAM_TOKEN"
-helius:
-  rpc_url: "wss://helius.example.com"
