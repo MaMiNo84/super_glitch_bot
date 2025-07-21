@@ -26,6 +26,7 @@ def test_parse_bonk_raw_instruction():
     assert source.parse_instruction(instruction) == "mintABC"
 
 
+
 def test_bonk_ignores_other_program():
     source = BonkSource("ws")
     instruction = {
@@ -33,3 +34,4 @@ def test_bonk_ignores_other_program():
         "parsed": {"type": "initialize", "info": {"mint": "mint123"}},
     }
     assert source.parse_instruction(instruction) is None
+
