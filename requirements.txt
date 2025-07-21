@@ -1,0 +1,6 @@
+pymongo
+websockets
+python-telegram-bot
+PyYAML
+jinja2
+matplotlib
