@@ -1,7 +1,12 @@
 """Telegram bot implementation."""
 
 from typing import Any
-from telegram.ext import Application, ApplicationBuilder, CommandHandler
+
+from telegram.ext import (
+    Application,
+    ApplicationBuilder,
+    CommandHandler,
+)
 
 from . import handlers
 
@@ -26,3 +31,9 @@ class TelegramBot:
 
         self.app.bot_data["manager"] = self.manager
         self.app.run_polling()
+
+    def send_message(self, chat_id: int, text: str) -> None:
+        """Send a plain text message."""
+        if not self.app:
+            raise RuntimeError("Bot not started")
+        self.app.bot.send_message(chat_id=chat_id, text=text)

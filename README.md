@@ -1,6 +1,9 @@
 # super_glitch_bot
 
 Skeleton implementation for a Solana token monitoring service.
+The service fetches token data from RugCheck and DexScreener, listens for new
+token mints via Helius WebSockets, and announces promising tokens via a Telegram
+bot while tracking performance.
 
 ## Installation
 ```bash

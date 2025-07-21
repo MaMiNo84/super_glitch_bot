@@ -4,3 +4,4 @@ python-telegram-bot
 PyYAML
 jinja2
 matplotlib
+requests
