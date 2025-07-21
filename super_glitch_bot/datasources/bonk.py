@@ -25,7 +25,7 @@ class BonkSource(ProgramHeliusSource):
 
             try:
                 raw = base64.b64decode(data_b64)
-            except Exception as exc:  # pragma: no cover - defensive
+            except (binascii.Error, ValueError) as exc:  # pragma: no cover - defensive
                 self.logger.debug("Bonk failed to decode data: %s", exc)
                 return None
 
