@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 from typing import Any, Awaitable, Callable, List, Optional
 
 import websockets
@@ -19,6 +20,7 @@ class HeliusSource:
         self.rpc_url = rpc_url
         self.program_ids = program_ids or []
         self.on_token = on_token
+        self.logger = logging.getLogger(__name__)
 
     async def _listen(self) -> None:
         request = {
@@ -32,6 +34,7 @@ class HeliusSource:
         }
 
         async with websockets.connect(self.rpc_url) as ws:
+            self.logger.info("Listening to Helius WebSocket %s", self.rpc_url)
             await ws.send(json.dumps(request))
             while True:
                 message = await ws.recv()

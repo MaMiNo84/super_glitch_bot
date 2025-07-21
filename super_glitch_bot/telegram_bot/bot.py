@@ -1,5 +1,6 @@
 """Telegram bot implementation."""
 
+import logging
 from typing import Any, Optional
 
 from telegram.ext import (
@@ -18,6 +19,7 @@ class TelegramBot:
         self.token = token
         self.manager = manager
         self.app: Optional[Application] = None
+        self.logger = logging.getLogger(__name__)
 
     async def run(self) -> None:
         """Start the Telegram bot and run until stopped."""
@@ -32,6 +34,7 @@ class TelegramBot:
         self.app.bot_data["manager"] = self.manager
 
         await self.app.initialize()
+        self.logger.info("Telegram bot starting")
         await self.app.start()
         await self.app.updater.start_polling()
         await self.app.updater.idle()
@@ -40,4 +43,5 @@ class TelegramBot:
         """Send a plain text message."""
         if not self.app:
             raise RuntimeError("Bot not started")
+        self.logger.info("Sending message to %s: %s", chat_id, text)
         await self.app.bot.send_message(chat_id=chat_id, text=text)

@@ -1,6 +1,6 @@
 """Dexscreener API integration."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import requests
 
@@ -17,3 +17,11 @@ class DexScreenerSource:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         return response.json()
+
+    def get_raydium_pair(self, data: Dict[str, Any]) -> Optional[str]:
+        """Return the Raydium pair address if present."""
+        pairs = data.get("pairs", [])
+        for pair in pairs:
+            if pair.get("dex") == "Raydium" and pair.get("pairAddress"):
+                return pair["pairAddress"]
+        return None

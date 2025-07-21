@@ -3,4 +3,4 @@ line-length = 88
 
 [tool.pytest.ini_options]
 minversion = '6.0'
-testpaths = ['super_glitch_bot/tests']
+testpaths = ['tests']
