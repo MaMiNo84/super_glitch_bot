@@ -5,11 +5,9 @@ This repository hosts a skeleton for a Solana token monitoring service. The foll
 - Keep the architecture modular and maintainable.
 - Use Python 3 with type hints and format code using `black` with line length 88.
 - When functions are not implemented yet, they may raise `NotImplementedError`.
-- After making changes, install requirements and attempt to run the main module:
+- After making changes, install requirements and attempt to run the project using Python 3.9.23:
   ```bash
   pip install -r requirements.txt
-  python -m super_glitch_bot.main
+  python main.py
   ```
-  The main module currently fails with `NotImplementedError`, which is expected.
-- Add tests under `super_glitch_bot/tests` when applicable.
-- Document significant updates in the README.
+  The main script currently fails with `NotImplementedError`, which is expected.

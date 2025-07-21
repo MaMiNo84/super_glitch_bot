@@ -4,7 +4,7 @@ Skeleton implementation for a Solana token monitoring service.
 
 ## Installation
 ```bash
-python -m venv venv
+python3.9 -m venv venv  # tested with Python 3.9.23
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ## Usage
 Run the project with:
 ```bash
-python -m super_glitch_bot.main
+python main.py
 ```
 
 ## Project Structure
