@@ -49,3 +49,12 @@ class TelegramBot:
         self.logger.info("Sending message to %s: %s", chat_id, text)
         self.logger.debug("Message length %d", len(text))
         await self.app.bot.send_message(chat_id=chat_id, text=text)
+
+    async def stop(self) -> None:
+        """Shut down the bot cleanly."""
+        if not self.app:
+            return
+        self.logger.info("Stopping Telegram bot")
+        await self.app.updater.stop()
+        await self.app.stop()
+        await self.app.shutdown()

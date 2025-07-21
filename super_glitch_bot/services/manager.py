@@ -1,5 +1,6 @@
 """Central service manager."""
 
+import asyncio
 import logging
 from typing import Any, Dict
 
@@ -56,7 +57,6 @@ class ServiceManager:
 
     async def start(self) -> None:
         """Start monitoring and bot services."""
-        import asyncio
 
         self.db.connect()
         self.logger.info("Service started")
@@ -114,10 +114,18 @@ class ServiceManager:
         else:
             self.logger.info("Token %s did not pass assessment", address)
 
-    def stop_monitoring(self) -> None:
-        """Placeholder to stop monitoring loop."""
-        # Monitor stopping logic would go here
-        pass
+    async def stop_monitoring(self) -> None:
+        """Stop all running tasks and close resources."""
+        tasks = [self.monitor_task, self.evaluator_task, self.performance_task]
+        self.logger.info("Stopping service tasks")
+        for task in tasks:
+            if task:
+                task.cancel()
+        await asyncio.gather(*(t for t in tasks if t), return_exceptions=True)
+
+        await self.bot.stop()
+        self.db.close()
+        self.logger.info("Service stopped")
 
     def start_platform(self, name: str) -> None:
         """Enable a monitoring platform."""

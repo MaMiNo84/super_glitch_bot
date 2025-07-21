@@ -42,3 +42,9 @@ class Database:
         if reason:
             updates["death_reason"] = reason
         self.update_token(address, updates)
+
+    def close(self) -> None:
+        """Close the database connection."""
+        if self.client:
+            self.logger.info("Closing MongoDB connection")
+            self.client.close()
