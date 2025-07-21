@@ -11,5 +11,4 @@ class TokenMonitor:
 
     def run(self) -> None:
         """Run the monitoring loop."""
-        # TODO: implement monitoring loop
-        raise NotImplementedError
+        self.source.start_listening()

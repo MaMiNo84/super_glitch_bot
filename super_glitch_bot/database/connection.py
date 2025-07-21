@@ -11,13 +11,15 @@ class Database:
         self.uri = uri
         self.name = name
         self.client: MongoClient | None = None
+        self.db = None
 
     def connect(self) -> None:
         """Establish the database connection."""
-        # TODO: implement connection logic
-        raise NotImplementedError
+        self.client = MongoClient(self.uri)
+        self.db = self.client[self.name]
 
     def get_collection(self, name: str) -> Any:
         """Return a collection by name."""
-        # TODO: implement retrieval
-        raise NotImplementedError
+        if self.db is None:
+            raise RuntimeError("Database not connected")
+        return self.db[name]

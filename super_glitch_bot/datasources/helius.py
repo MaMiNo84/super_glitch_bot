@@ -11,5 +11,6 @@ class HeliusSource:
 
     def start_listening(self) -> None:
         """Begin listening for token creation events."""
-        # TODO: implement WebSocket connection and monitoring
-        raise NotImplementedError
+        # Placeholder implementation. Real implementation would connect to the
+        # websocket endpoint and yield events.
+        print(f"Listening for tokens via {self.rpc_url}")
