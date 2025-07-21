@@ -1,0 +1,13 @@
+# CONTEXT
+
+This project is a fresh start for a Solana token monitoring bot. The service will
+watch new token creations using the Helius websocket RPC (additional platforms to
+be added later) and collect metadata from sources such as rugcheck.xyz,
+dexscreener, and birdeye. Token data is stored in MongoDB and evaluated against
+rules to identify "Gems". Notifications and updates are sent through a Telegram
+bot.
+
+Architecture includes configuration loading, database models, data source
+integrations, assessment and monitoring services, performance tracking, and bot
+commands. All modules currently contain placeholder functions that raise
+`NotImplementedError` until they are implemented.
