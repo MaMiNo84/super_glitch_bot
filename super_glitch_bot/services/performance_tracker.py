@@ -32,7 +32,7 @@ class PerformanceTracker:
         }
         self.calls += 1
 
-    def update(self) -> None:
+    async def update(self) -> None:
         """Send performance updates."""
         for addr, info in self.tokens.items():
             data = self.dexscreener.fetch_token_data(addr)
@@ -42,7 +42,7 @@ class PerformanceTracker:
             if not info["hit_2x"] and price >= 2 * info["initial_price"]:
                 info["hit_2x"] = True
                 self.calls_2x += 1
-                self.bot.send_message(
+                await self.bot.send_message(
                     self.chat_id,
                     MessageTemplates.PERFORMANCE_UPDATE.format(
                         token_name=token_name,

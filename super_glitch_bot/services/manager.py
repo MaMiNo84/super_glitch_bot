@@ -7,7 +7,6 @@ from ..datasources.dexscreener import DexScreenerSource
 from ..datasources.helius import HeliusSource
 from ..datasources.rugcheck import RugCheckSource
 from ..telegram_bot.bot import TelegramBot
-from ..utils.threading_utils import run_in_thread
 from .monitor import TokenMonitor
 from .assessor import TokenAssessor
 from .performance_tracker import PerformanceTracker
@@ -33,15 +32,17 @@ class ServiceManager:
             self.handle_new_token,
         )
         self.monitor = TokenMonitor(helius, self.handle_new_token)
-        self.monitor_thread = None
+        self.monitor_task = None
 
-    def start(self) -> None:
+    async def start(self) -> None:
         """Start monitoring and bot services."""
-        self.db.connect()
-        self.monitor_thread = run_in_thread(self.monitor.run)
-        self.bot.start()
+        import asyncio
 
-    def handle_new_token(self, address: str) -> None:
+        self.db.connect()
+        self.monitor_task = asyncio.create_task(self.monitor.run())
+        await self.bot.run()
+
+    async def handle_new_token(self, address: str) -> None:
         """Process a newly created token."""
         rug_data = self.rugcheck.fetch_token_data(address)
         dex_data = self.dexscreener.fetch_token_data(address)
@@ -58,7 +59,7 @@ class ServiceManager:
 
         if self.assessor.assess(token.__dict__):
             chat_id = self.config["telegram"]["admins"][0]
-            self.bot.send_message(
+            await self.bot.send_message(
                 chat_id,
                 MessageTemplates.NEW_GEM.format(token_name=token.name or token.address),
             )

@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-from typing import Any, Callable, List, Optional
+from typing import Any, Awaitable, Callable, List, Optional
 
 import websockets
 
@@ -14,7 +14,7 @@ class HeliusSource:
         self,
         rpc_url: str,
         program_ids: Optional[List[str]] = None,
-        on_token: Optional[Callable[[str], None]] = None,
+        on_token: Optional[Callable[[str], Awaitable[None]]] = None,
     ) -> None:
         self.rpc_url = rpc_url
         self.program_ids = program_ids or []
@@ -45,10 +45,12 @@ class HeliusSource:
                     if parsed and parsed.get("type") == "initializeMint":
                         mint = parsed.get("info", {}).get("mint")
                         if mint and self.on_token:
-                            self.on_token(mint)
+                            await self.on_token(mint)
 
-    def start_listening(self, on_token: Optional[Callable[[str], None]] = None) -> None:
+    async def start_listening(
+        self, on_token: Optional[Callable[[str], Awaitable[None]]] = None
+    ) -> None:
         """Begin listening for token creation events."""
         if on_token is not None:
             self.on_token = on_token
-        asyncio.run(self._listen())
+        await self._listen()
