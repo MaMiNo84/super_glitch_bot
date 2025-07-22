@@ -61,7 +61,7 @@ class ChartGenerator:
                 try:
                     img = self._circular_logo(logo_url)
                     fig.figimage(img, 10, fig.bbox.ymax - img.size[1] - 10)
-                except Exception:
+                except (requests.RequestException, PIL.UnidentifiedImageError):
                     pass
             fig.savefig(tmp.name)
             plt.close(fig)
